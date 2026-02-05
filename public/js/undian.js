@@ -21,7 +21,9 @@ async function loadHadiah() {
 }
 
 async function enroll() {
+   
    setUIState("shuffling");
+
   // ambil nomor undian
     const cb = document.getElementById("cmbHadiah");
     if (!cb.value) {
@@ -43,8 +45,6 @@ async function enroll() {
         setUIState("locked");
         return;
     }
-
-    setUIState("shuffling");
 
     const res = await fetch("/api/undian/nomor-tersedia");
     currentCandidates = await res.json();
@@ -171,11 +171,54 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.getElementById("enrollBtn").addEventListener("click", enroll);
   document.getElementById("stopBtn").addEventListener("click", stopShuffle);
-  document.getElementById("resetBtn").addEventListener("click", resetAll);
+  //document.getElementById("resetBtn").addEventListener("click", resetAll);
 
   // 🔥 Tambahkan ini
   document.getElementById("cmbHadiah").addEventListener("change", () => {
     setUIState("idle");
     document.getElementById("status").textContent = "READY";
   });
+
+// ==== POPUP KONFIRMASI RESET ==== //
+// === CUSTOM MODAL ===
+const modal = document.getElementById("resetModal");
+const modalCancelBtn = document.getElementById("modalCancelBtn");
+const modalOkBtn = document.getElementById("modalOkBtn");
+const resetInput = document.getElementById("resetInput");
+
+function showResetModal() {
+    resetInput.value = "";
+    modal.style.display = "flex"; // tampil
+}
+
+function hideResetModal() {
+    modal.style.display = "none"; // sembunyikan
+}
+
+// buka modal saat klik RESET
+document.getElementById("resetBtn").addEventListener("click", showResetModal);
+
+// tombol batal
+modalCancelBtn.addEventListener("click", hideResetModal);
+
+// tombol OK
+modalOkBtn.addEventListener("click", () => {
+    if (resetInput.value.trim().toLowerCase() === "reset ok") {
+        hideResetModal();
+        resetAll();
+    } else {
+        alert('Teks tidak sesuai. Ketik "reset ok".');
+    }
 });
+
+// klik di luar kotak untuk menutup
+modal.addEventListener("click", (e) => {
+    if (e.target === modal) hideResetModal();
+});
+
+
+});
+
+
+
+
