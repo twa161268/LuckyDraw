@@ -1,4 +1,4 @@
-const { sql } = require("../db");
+const { pool } = require("../db");
 
 const {
     createMemberSchema,
@@ -10,7 +10,7 @@ const AppError = require("../utils/appError");
 // GET ALL
 exports.getAllMembers = async (req, res, next) => {
     try {
-        const result = await sql.query(`
+        const result = await pool.query(`
             SELECT 
                 member_id,
                 member_name,
@@ -32,7 +32,7 @@ exports.getMemberById = async (req, res, next) => {
     const { id } = req.params;
 
     try {
-        const result = await sql.query`
+        const result = await pool.query`
             SELECT * FROM MEMBER_TWA WHERE member_id = ${id}
         `;
 
@@ -65,7 +65,7 @@ exports.createMember = async (req, res, next) => {
     } = req.body;
 
     try {
-        await sql.query`
+        await pool.query`
             INSERT INTO MEMBER_TWA (
                 member_id, member_name, email, mobile_phone, join_date, birth_date
             )
@@ -93,7 +93,7 @@ exports.updateMember = async (req, res, next) => {
     const { member_name, email, mobile_phone, join_date,  birth_date } = req.body;
 
     try {
-        await sql.query`
+        await pool.query`
             UPDATE MEMBER_TWA
             SET member_name = ${member_name},
                 email = ${email},
@@ -114,7 +114,7 @@ exports.deleteMember = async (req, res, next) => {
     const { id } = req.params;
 
     try {
-        await sql.query`
+        await pool.query`
             DELETE FROM MEMBER_TWA WHERE member_id = ${id}
         `;
 
@@ -129,7 +129,7 @@ exports.getSalesById = async (req, res, next) => {
     const { id } = req.params;
 
     try {
-        const result = await sql.query`
+        const result = await pool.query`
             SELECT a.periode, a.member_id, b.member_name, a.tgl_trx, a.tdp,a.tbv FROM SALES_TWA a
             left outer join MEMBER_TWA b on (a.member_ID = b.member_ID)
             WHERE a.member_id = ${id}

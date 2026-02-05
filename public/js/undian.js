@@ -13,8 +13,8 @@ async function loadHadiah() {
     cb.innerHTML = "";
     data.forEach(h => {
         cb.innerHTML += `
-            <option value="${h.NomorHadiah}" data-jumlah="${h.JumlahHadiah}">
-                ${h.Hadiah}
+            <option value="${h.nomorhadiah}" data-jumlah="${h.jumlahhadiah}">
+                ${h.hadiah}
             </option>
         `;
     });
@@ -57,8 +57,8 @@ async function enroll() {
             const rnd = currentCandidates[
                 Math.floor(Math.random() * currentCandidates.length)
             ];
-            box.value = rnd.NomorUndian;
-            box.dataset.nama = rnd.Nama;
+            box.value = rnd.nomorundian;
+            box.dataset.nama = rnd.nama;
         });
     }, 80);
 }
@@ -79,8 +79,8 @@ async function stopShuffle() {
   const winners = [];
   document.querySelectorAll(".box").forEach(box => {
     winners.push({
-      NomorUndian: box.value,
-      Nama: box.dataset.nama
+      nomorundian: box.value,
+      nama: box.dataset.nama
     });
   
 
@@ -158,8 +158,8 @@ function buatTextbox(jumlah) {
 function tampilkanPemenang(data) {
   buatTextbox(data.length);
   document.querySelectorAll(".box").forEach((box, i) => {
-    box.value = data[i].NomorUndian;
-    box.dataset.nama = data[i].Nama;
+    box.value = data[i].nomorundian;
+    box.dataset.nama = data[i].nama;
     box.classList.add("locked");
   });
   document.getElementById("status").textContent = "FINAL";

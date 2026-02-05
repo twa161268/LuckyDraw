@@ -1,12 +1,12 @@
-const { pool, sql } = require("../db");
+const { pool } = require("../db");
 
 /** Combo box hadiah */
 exports.getHadiah = async (req, res) => {
   try {
-    const result = await pool.request().query(
-      "SELECT * FROM TWA_UNDIANHADIAH"
+    const result = await pool.query(
+      "SELECT * FROM twa_undianhadiah"
     );
-    res.json(result.recordset);
+    res.json(result.rows);
   } catch (err) {
     console.error(err);
     res.status(500).send("DB error");
@@ -17,29 +17,25 @@ exports.getHadiah = async (req, res) => {
 /** Nomor undian yg belum pernah menang */
 exports.getNomorTersedia = async (req, res) => {
     //const p = await pool;
-    const result = await pool.request().query(`
-        SELECT NomorUndian, Nama
-        FROM TWA_UNDIAN_NOMOR
-        WHERE NomorUndian NOT IN (
-            SELECT NomorUndian FROM TWA_UNDIANHASIL
+    const result = await pool.query(`
+        SELECT nomorundian, nama
+        FROM twa_undian_nomor
+        WHERE nomorundian NOT IN (
+            SELECT nomorundian FROM twa_undianhasil
         )
     `);
-    res.json(result.recordset);
+    res.json(result.rows);
 };
 
 /** Cek hasil hadiah tertentu */
 exports.getHasilByHadiah = async (req, res) => {
     const { nomorHadiah } = req.params;
-    //const p = await pool;
-
-    const result = await pool.request()
-        .input("nomorHadiah", sql.VarChar, nomorHadiah)
-        .query(`
-            SELECT * FROM TWA_UNDIANHASIL
-            WHERE NomorHadiah = @nomorHadiah
-        `);
-
-    res.json(result.recordset);
+    console.log(nomorHadiah);
+    const result = await pool.query(
+        `SELECT * FROM twa_undianhasil WHERE nomorhadiah = $1`,
+        [nomorHadiah]
+    );
+    res.json(result.rows);
 };
 
 /** Simpan hasil undian */
@@ -48,14 +44,10 @@ exports.simpanHasil = async (req, res) => {
     //const p = await pool;
 
     for (const w of winners) {
-        await pool.request()
-            .input("NomorUndian", sql.VarChar, w.NomorUndian)
-            .input("Nama", sql.VarChar, w.Nama)
-            .input("NomorHadiah", sql.VarChar, nomorHadiah)
-            .query(`
-                INSERT INTO TWA_UNDIANHASIL
-                VALUES (@NomorUndian, @Nama, @NomorHadiah)
-            `);
+        await pool.query(
+            `INSERT INTO twa_undianhasil (nomorundian, nama, nomorhadiah) VALUES ($1, $2, $3)`,
+            [w.nomorundian, w.nama, nomorHadiah]
+        );
     }
     res.json({ success: true });
 };
@@ -63,6 +55,6 @@ exports.simpanHasil = async (req, res) => {
 /** RESET */
 exports.resetHasil = async (req, res) => {
     //const p = await pool;
-    await pool.request().query("DELETE FROM TWA_UNDIANHASIL");
+    await pool.query("DELETE FROM twa_undianhasil");
     res.json({ success: true });
 };
